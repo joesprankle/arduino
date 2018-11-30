@@ -48,8 +48,6 @@
 
 int coinSensVal = 0;
 
-
-
 // For better pressure precision, we need to know the resistance
 // between X+ and X- Use any multimeter to read it
 // For the one we're using, its 300 ohms across the X plate
@@ -59,8 +57,7 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 364);
 //Size of key containers 70px
 #define BOXSIZE 100
 
-
-
+String  creditString = "Credit: $0.00";
 Adafruit_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
 
 
@@ -92,8 +89,15 @@ void setup() {
 }
 
 void loop() {
+    tft.fillScreen(LIGHTGREY);
+
+  tft.setRotation(2);
+
+  // draw num pad
+  createButtons();
   // my coin dummy tool was too fast without this, revisit when buiding the appliance
-  delay(1700);
+  delay(1000);
+
   //read the pushbutton value into a variable
   int sensorVal = digitalRead(52);
   //print out the value of the pushbutton
@@ -105,11 +109,35 @@ void loop() {
   Serial.println("  ");
   Serial.println("  ");
   Serial.println("  ");
+  Serial.println(creditString);
 
 
   if (sensorVal == LOW)
   {
     coinSensVal++;
+    tft.fillScreen(LIGHTGREY);
+    if (coinSensVal == 0) {
+      creditString = "Credit: $0.00";
+    }
+    if (coinSensVal == 1) {
+      creditString = "Credit: $0.25";
+    }
+    if (coinSensVal == 2) {
+      creditString = "Credit: $0.50";
+    }
+    if (coinSensVal == 3) {
+      creditString = "Credit: $0.75";
+    }
+    if (coinSensVal == 4) {
+      creditString = "Credit: $1.00";
+    }
+    if (coinSensVal == 5) {
+      creditString = "Credit: $1.25";
+    }
+    if (coinSensVal == 6) {
+      creditString = "Select  Item";
+    }
+    createButtons();
     if (coinSensVal > 5)
     {
       //this is it, send a servot to light up
@@ -119,6 +147,7 @@ void loop() {
 
         // pressure of 0 means no pressing!
         if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
+          //this delay is to make sure we record one touch only
           delay(500);
           //  Serial.print("X = "); Serial.print(p.x);
           // Serial.print("\tY = "); Serial.print(p.y);
@@ -160,9 +189,9 @@ void loop() {
         }
 
       }
-
+      
       coinSensVal = 0;
-
+  
     }
     // digitalWrite(13, LOW); joe save these for reference to light up servo
   }
@@ -213,7 +242,7 @@ void createButtons() {
   tft.fillRect(10, 230, 220, 85, GREY);
   tft.setCursor(40, 265);
   tft.setTextSize(2);
-  tft.println("Credit: $1.50");
+  tft.println(creditString);
 
 
 
